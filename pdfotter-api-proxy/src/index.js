@@ -39,10 +39,26 @@ export default {
     requestHeaders.delete('X-Worker-Key');
 
     try {
+      // To ensure the request body is correctly formatted and Content-Type is respected,
+      // we need to handle JSON and other data types (like multipart/form-data) differently.
+      let body = null;
+      if (request.method === 'POST' || request.method === 'PUT') {
+        const contentType = request.headers.get('Content-Type') || '';
+
+        if (contentType.includes('application/json')) {
+          // For JSON, we read and re-stringify it to ensure it's a clean payload.
+          const jsonBody = await request.json();
+          body = JSON.stringify(jsonBody);
+        } else {
+          // For other types (like multipart/form-data), we forward the raw blob.
+          body = await request.blob();
+        }
+      }
+
       const response = await fetch(targetUrl, {
         method: request.method,
         headers: requestHeaders,
-        body: request.body,
+        body: body,
         redirect: 'follow',
       });
 
