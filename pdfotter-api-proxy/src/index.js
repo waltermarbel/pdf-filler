@@ -14,6 +14,34 @@
 
 const PDF_OTTER_BASE_URL = 'https://www.pdfotter.com/api/v1';
 
+// --- Prefetch Logic Configuration ---
+const knownProfiles = {
+  "roy.bello@example.com": {
+    templateId: "tem_7WBuGSfWyatmFA",
+    data: {
+      "First name:": "Roy",
+      "Last name:": "Bello",
+      "Email address:": "roy.bello@example.com",
+    }
+  },
+  "pablo.choy@example.com": {
+    templateId: "tem_4ojiqN5ey48qsg",
+    data: {
+      "First name:": "Pablo",
+      "Last name:": "Choy",
+      "Email address:": "pablo.choy@example.com",
+    }
+  },
+  "maleidy.martinez@example.com": {
+    templateId: "tem_RSYSFfp7hfVsux",
+    data: {
+      "First name:": "Maleidy",
+      "Last name:": "Martinez",
+      "Email address:": "maleidy.martinez@example.com",
+    }
+  }
+};
+
 export default {
   async fetch(request, env, ctx) {
     if (request.method === 'OPTIONS') {
@@ -29,8 +57,34 @@ export default {
     }
 
     const url = new URL(request.url);
-    const targetUrl = PDF_OTTER_BASE_URL + url.pathname;
+    let targetUrl = PDF_OTTER_BASE_URL + url.pathname;
     const isFillEndpoint = url.pathname.endsWith('/fill');
+
+    let requestBody = {};
+    let finalBody = null;
+
+    if (request.method === 'POST' || request.method === 'PUT') {
+      const contentType = request.headers.get('Content-Type') || '';
+      if (contentType.includes('application/json')) {
+        requestBody = await request.json();
+
+        // --- Prefetch Logic ---
+        if (isFillEndpoint && requestBody.data) {
+          const email = requestBody.data['Email address:'] || requestBody.data['Email address'];
+          const profile = knownProfiles[email];
+
+          if (profile) {
+            // Dynamically set the templateId for the API call
+            targetUrl = `${PDF_OTTER_BASE_URL}/pdf_templates/${profile.templateId}/fill`;
+            // Merge profile data with incoming data
+            requestBody.data = { ...profile.data, ...requestBody.data };
+          }
+        }
+        finalBody = JSON.stringify(requestBody);
+      } else {
+        finalBody = await request.blob();
+      }
+    }
 
     const pdfOtterAuth = btoa(`${env.PDFOTTER_API_KEY}:`);
     const requestHeaders = new Headers(request.headers);
@@ -39,10 +93,10 @@ export default {
     requestHeaders.delete('X-Worker-Key');
 
     try {
-      const targetUrl = PDF_OTTER_BASE_URL + (isFillEndpoint ? url.pathname : '/fill');
+      const response = await fetch(targetUrl, {
         method: request.method,
         headers: requestHeaders,
-        body: request.body,
+        body: finalBody,
         redirect: 'follow',
       });
 
