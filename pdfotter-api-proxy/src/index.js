@@ -39,7 +39,7 @@ export default {
     requestHeaders.delete('X-Worker-Key');
 
     try {
-      const response = await fetch(targetUrl, {
+      const targetUrl = PDF_OTTER_BASE_URL + (isFillEndpoint ? url.pathname : '/fill');
         method: request.method,
         headers: requestHeaders,
         body: request.body,
