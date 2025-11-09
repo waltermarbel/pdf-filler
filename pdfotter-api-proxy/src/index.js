@@ -39,7 +39,7 @@ export default {
     requestHeaders.delete('X-Worker-Key');
 
     try {
-      const response = await fetch(targetUrl.startsWith(PDF_OTTER_BASE_URL) ? targetUrl : new Response(null, { status: 400 }), {
+      const response = await fetch(targetUrl.startsWith(PDF_OTTER_BASE_URL) && url.hostname === new URL(PDF_OTTER_BASE_URL).hostname ? targetUrl : new Response(null, { status: 400 }), {
         method: request.method,
         headers: requestHeaders,
         body: request.body,
