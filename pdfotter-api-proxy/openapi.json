@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://pdfotter-api-proxy.your-name.workers.dev"
+      "url": "https://pdfotter-api-proxy.roybello.workers.dev"
     }
   ],
   "paths": {
@@ -71,18 +71,18 @@
       }
     },
     "/pdf_templates/{templateId}": {
-      "parameters": [
-        {
-          "name": "templateId",
-          "in": "path",
-          "required": true,
-          "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
-          "schema": { "type": "string" }
-        }
-      ],
       "get": {
         "description": "Retrieves a specific PDF Template’s details, including its fields.",
         "operationId": "getPdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
         "responses": {
           "200": { "description": "Template details." }
         }
@@ -90,6 +90,15 @@
       "put": {
         "description": "Updates a PDF Template's properties, such as its name.",
         "operationId": "updatePdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -109,24 +118,33 @@
       "delete": {
         "description": "Deletes the specified PDF template.",
         "operationId": "deletePdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
         "responses": {
           "204": { "description": "Template deleted successfully." }
         }
       }
     },
     "/pdf_templates/{templateId}/fill": {
-      "parameters": [
-        {
-          "name": "templateId",
-          "in": "path",
-          "required": true,
-          "description": "The ID of the PDF template to fill (e.g., 'tem_XuwCXY2tEBLf7P').",
-          "schema": { "type": "string" }
-        }
-      ],
       "post": {
         "description": "Fills in a PDF Template with the data provided and returns the binary PDF file.",
         "operationId": "fillPdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template to fill (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -162,6 +180,7 @@
     }
   },
   "components": {
+    "schemas": {},
     "securitySchemes": {
       "api_key": {
         "type": "apiKey",
