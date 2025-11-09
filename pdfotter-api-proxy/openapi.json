@@ -1,0 +1,197 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Secure PDF Otter API Proxy",
+    "description": "A universal proxy for creating, managing, and filling PDF templates via the PDF Otter API.",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://pdfotter-api-proxy.roybello.workers.dev"
+    }
+  ],
+  "paths": {
+    "/pdf_templates": {
+      "get": {
+        "description": "Retrieves all PDF Templates associated with the account.",
+        "operationId": "listPdfTemplates",
+        "responses": {
+          "200": {
+            "description": "A list of PDF templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "name": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new PDF Template from an uploaded file.",
+        "operationId": "createPdfTemplate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The PDF file to create the template from."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "A name for the new template."
+                  }
+                },
+                "required": ["file", "name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF template creation initiated.",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/pdf_templates/{templateId}": {
+      "get": {
+        "description": "Retrieves a specific PDF Template’s details, including its fields.",
+        "operationId": "getPdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Template details." }
+        }
+      },
+      "put": {
+        "description": "Updates a PDF Template's properties, such as its name.",
+        "operationId": "updatePdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Template updated successfully." }
+        }
+      },
+      "delete": {
+        "description": "Deletes the specified PDF template.",
+        "operationId": "deletePdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Template deleted successfully." }
+        }
+      }
+    },
+    "/pdf_templates/{templateId}/fill": {
+      "post": {
+        "description": "Fills in a PDF Template with the data provided and returns the binary PDF file.",
+        "operationId": "fillPdfTemplate",
+        "parameters": [
+          {
+            "name": "templateId",
+            "in": "path",
+            "required": true,
+            "description": "The ID of the PDF template to fill (e.g., 'tem_XuwCXY2tEBLf7P').",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "A key-value object where keys are the field names in the PDF template and values are the data to fill in. For image fields, the value must be a base64 encoded string."
+                  }
+                },
+                "required": ["data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The filled PDF document.",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "X-Worker-Key",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ]
+}

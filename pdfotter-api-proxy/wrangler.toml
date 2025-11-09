@@ -1,0 +1,30 @@
+name = "pdfotter-api-proxy"
+main = "src/index.js"
+compatibility_date = "2023-11-07"
+
+# R2 bucket for storing the filled PDFs generated via the '/fill' endpoint.
+[[r2_buckets]]
+binding = "PDF_BUCKET"
+bucket_name = "filled-claims" # <-- Replace with your R2 bucket name
+
+# --- SECRET MANAGEMENT ---
+# This worker requires TWO secrets to be set for EACH environment.
+#
+# 1. PDFOTTER_API_KEY: Your API key from pdfotter.com.
+#    For Production, use your 'prod' key:
+#    npx wrangler secret put PDFOTTER_API_KEY
+#
+#    For Staging, use your 'test' key:
+#    npx wrangler secret put PDFOTTER_API_KEY --env staging
+#
+# 2. WORKER_KEY: A secret password to protect this worker.
+#    For Production:
+#    npx wrangler secret put WORKER_KEY
+#
+#    For Staging:
+#    npx wrangler secret put WORKER_KEY --env staging
+
+# --- ENVIRONMENTS ---
+# The default environment is production.
+[env.staging]
+name = "pdfotter-api-proxy-staging"
